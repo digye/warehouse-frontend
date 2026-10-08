@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { API_BASE } from '../api.js';
 
 const emptyForm = {
   requester_name: '',
@@ -23,7 +24,7 @@ export default function MaterialRequest() {
 
   // Load the list of real products for the item dropdowns
   useEffect(() => {
-    fetch('/api/material-requests/items')
+    fetch(`${API_BASE}/material-requests/items`)
       .then((res) => {
         if (!res.ok) throw new Error('Could not load items');
         return res.json();
@@ -76,7 +77,7 @@ export default function MaterialRequest() {
     setSending(true);
     setError('');
     try {
-      const res = await fetch('/api/material-requests', {
+      const res = await fetch(`${API_BASE}/material-requests`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -123,23 +124,21 @@ export default function MaterialRequest() {
         {step === 'form' && (
           <form className="panel" onSubmit={handlePreview} style={{ padding: 24 }}>
             <div className="field">
-              <label htmlFor="requester_name"> Name</label>
+              <label htmlFor="requester_name">Your name</label>
               <input
                 id="requester_name"
                 value={form.requester_name}
                 onChange={(e) => update('requester_name', e.target.value)}
-                placeholder="Enter your fullname"
                 required
               />
             </div>
             <div className="field">
-              <label htmlFor="requester_email"> Email Address</label>
+              <label htmlFor="requester_email">Your email</label>
               <input
                 id="requester_email"
                 type="email"
                 value={form.requester_email}
                 onChange={(e) => update('requester_email', e.target.value)}
-                placeholder="Enter your email address"
                 required
               />
             </div>
@@ -225,7 +224,7 @@ export default function MaterialRequest() {
               />
             </div>
             <div className="field">
-              <label htmlFor="warehouse_name">Warehouse Name</label>
+              <label htmlFor="warehouse_name">Warehouse name</label>
               <input
                 id="warehouse_name"
                 value={form.warehouse_name}
@@ -234,13 +233,12 @@ export default function MaterialRequest() {
               />
             </div>
             <div className="field">
-              <label htmlFor="warehouse_email">Warehouse Email</label>
+              <label htmlFor="warehouse_email">Warehouse email (where this request is sent)</label>
               <input
                 id="warehouse_email"
                 type="email"
                 value={form.warehouse_email}
                 onChange={(e) => update('warehouse_email', e.target.value)}
-                placeholder="elvysmartinz@gmail.com"
                 required
               />
             </div>
