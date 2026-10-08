@@ -1,10 +1,17 @@
 // Wraps fetch() so every request automatically includes the login token
-// and points at the back end (proxied through /api in vite.config.js).
+// and points at the back end.
+//
+// Locally (npm run dev), VITE_API_BASE is unset, so this falls back to '/api',
+// which Vite's dev proxy forwards to localhost:4000 (see vite.config.js).
+// In production, VITE_API_BASE is set at build time (on Render, as an
+// environment variable on the frontend service) to the real back-end URL,
+// e.g. https://warehouse-backend-xxxx.onrender.com/api
+export const API_BASE = import.meta.env.VITE_API_BASE || '/api';
 
 export async function apiRequest(path, options = {}) {
   const token = localStorage.getItem('token');
 
-  const res = await fetch(`/api${path}`, {
+  const res = await fetch(`${API_BASE}${path}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
