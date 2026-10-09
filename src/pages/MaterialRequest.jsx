@@ -124,21 +124,23 @@ export default function MaterialRequest() {
         {step === 'form' && (
           <form className="panel" onSubmit={handlePreview} style={{ padding: 24 }}>
             <div className="field">
-              <label htmlFor="requester_name">Your name</label>
+              <label htmlFor="requester_name">Full Name</label>
               <input
                 id="requester_name"
                 value={form.requester_name}
                 onChange={(e) => update('requester_name', e.target.value)}
+                placeholder="please enter your full name"
                 required
               />
             </div>
             <div className="field">
-              <label htmlFor="requester_email">Your email</label>
+              <label htmlFor="requester_email">Email Address</label>
               <input
                 id="requester_email"
                 type="email"
                 value={form.requester_email}
                 onChange={(e) => update('requester_email', e.target.value)}
+                placeholder="please enter your email address"
                 required
               />
             </div>
@@ -224,21 +226,23 @@ export default function MaterialRequest() {
               />
             </div>
             <div className="field">
-              <label htmlFor="warehouse_name">Warehouse name</label>
+              <label htmlFor="warehouse_name">Warehouse Name</label>
               <input
                 id="warehouse_name"
                 value={form.warehouse_name}
                 onChange={(e) => update('warehouse_name', e.target.value)}
+                placeholder="please select a warehouse"
                 required
               />
             </div>
             <div className="field">
-              <label htmlFor="warehouse_email">Warehouse email (where this request is sent)</label>
+              <label htmlFor="warehouse_email">Warehouse Email</label>
               <input
                 id="warehouse_email"
                 type="email"
                 value={form.warehouse_email}
                 onChange={(e) => update('warehouse_email', e.target.value)}
+                placeholder="please select the warehouse email"
                 required
               />
             </div>
