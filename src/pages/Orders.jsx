@@ -9,6 +9,7 @@ export default function Orders() {
   const [destination, setDestination] = useState('');
   const [items, setItems] = useState([{ product_id: '', quantity: '' }]);
   const [saving, setSaving] = useState(false);
+  const [issuingId, setIssuingId] = useState(null);
 
   function load() {
     Promise.all([apiRequest('/orders'), apiRequest('/products')])
@@ -55,6 +56,21 @@ export default function Orders() {
       setError(err.message);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleIssue(order) {
+    if (!window.confirm(`Mark this order as received by ${order.customer_or_destination}?`)) return;
+    setIssuingId(order.order_id);
+    setError('');
+    try {
+      await apiRequest(`/orders/${order.order_id}/issue`, { method: 'PATCH' });
+      load();
+    } catch (err) {
+      setError(err.message);
+      load();
+    } finally {
+      setIssuingId(null);
     }
   }
 
@@ -141,6 +157,7 @@ export default function Orders() {
               <th>Items</th>
               <th>Status</th>
               <th>Date</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -152,8 +169,29 @@ export default function Orders() {
                     ? o.items.map((i) => `${i.product_name} ×${i.quantity}`).join(', ')
                     : '—'}
                 </td>
-                <td>{o.status}</td>
+                <td>
+                  <span className={`tag ${o.status === 'issued' ? 'tag-ok' : 'tag-pending'}`}>
+                    {o.status === 'issued' ? 'Issued' : 'Pending'}
+                  </span>
+                  {o.status === 'issued' && o.issued_at && (
+                    <div style={{ color: 'var(--muted)', fontSize: 11, marginTop: 2 }}>
+                      {new Date(o.issued_at).toLocaleString()}
+                    </div>
+                  )}
+                </td>
                 <td>{new Date(o.order_date).toLocaleDateString()}</td>
+                <td>
+                  {o.status !== 'issued' && (
+                    <button
+                      className="btn"
+                      disabled={issuingId === o.order_id}
+                      onClick={() => handleIssue(o)}
+                      style={{ padding: '6px 12px' }}
+                    >
+                      {issuingId === o.order_id ? 'Marking...' : 'Mark as issued'}
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
           </tbody>
