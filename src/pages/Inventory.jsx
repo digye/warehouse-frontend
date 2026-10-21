@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Fragment } from 'react';
 import { apiRequest } from '../api.js';
 
 export default function Inventory() {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState([]); // grouped by product, each with a .warehouses breakdown
   const [products, setProducts] = useState([]);
   const [locations, setLocations] = useState([]);
   const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ product_id: '', location_id: '', quantity: '' });
   const [saving, setSaving] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
 
   function load() {
     Promise.all([
@@ -54,6 +55,10 @@ export default function Inventory() {
     }
   }
 
+  function toggle(id) {
+    setExpandedId((current) => (current === id ? null : id));
+  }
+
   const canAdd = products.length && locations.length;
 
   return (
@@ -61,7 +66,7 @@ export default function Inventory() {
       <div className="page-header">
         <div>
           <h1>Inventory</h1>
-          <p>Current stock across all locations</p>
+          <p>Stock by product, broken down by warehouse</p>
         </div>
         <button className="btn" onClick={() => setShowForm((v) => !v)} disabled={!canAdd}>
           {showForm ? 'Cancel' : 'Add stock'}
@@ -87,7 +92,9 @@ export default function Inventory() {
               style={{ width: '100%', padding: '9px 12px', borderRadius: 6, border: '1px solid var(--line)' }}
             >
               {products.map((p) => (
-                <option key={p.product_id} value={p.product_id}>{p.name} ({p.sku})</option>
+                <option key={p.product_id} value={p.product_id}>
+                  {p.name}{p.item_type ? ` — ${p.item_type}` : ''} ({p.sku})
+                </option>
               ))}
             </select>
           </div>
@@ -127,19 +134,60 @@ export default function Inventory() {
         <table>
           <thead>
             <tr>
-              <th>Product</th>
-              <th>Location</th>
-              <th>Quantity</th>
+              <th></th>
+              <th>Item</th>
+              <th>SKU</th>
+              <th>Total quantity</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr key={r.inventory_id}>
-                <td>{r.product}</td>
-                <td>{[r.aisle, r.shelf, r.bin].filter(Boolean).join('-')}</td>
-                <td>{r.quantity}</td>
-              </tr>
-            ))}
+            {rows.map((r) => {
+              const expanded = expandedId === r.product_id;
+              return (
+                <Fragment key={r.product_id}>
+                  <tr onClick={() => toggle(r.product_id)} style={{ cursor: 'pointer' }}>
+                    <td style={{ color: 'var(--muted)', width: 20 }}>{expanded ? '▾' : '▸'}</td>
+                    <td>
+                      {r.name}
+                      {r.item_type && (
+                        <span style={{ color: 'var(--muted)' }}> — {r.item_type}</span>
+                      )}
+                    </td>
+                    <td>{r.sku}</td>
+                    <td>{r.total_quantity}</td>
+                  </tr>
+                  {expanded && (
+                    <tr>
+                      <td></td>
+                      <td colSpan={3} style={{ background: 'var(--paper)', padding: '12px 16px' }}>
+                        {r.warehouses.length === 0 ? (
+                          <p style={{ color: 'var(--muted)', fontSize: 13, margin: 0 }}>
+                            No stock recorded in any warehouse yet.
+                          </p>
+                        ) : (
+                          <table style={{ width: '100%' }}>
+                            <thead>
+                              <tr>
+                                <th style={{ padding: '4px 0', fontSize: 12 }}>Warehouse</th>
+                                <th style={{ padding: '4px 0', fontSize: 12, textAlign: 'right' }}>Quantity</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {r.warehouses.map((w) => (
+                                <tr key={w.warehouse_id}>
+                                  <td style={{ padding: '4px 0', border: 'none' }}>{w.warehouse_name}</td>
+                                  <td style={{ padding: '4px 0', border: 'none', textAlign: 'right' }}>{w.quantity}</td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        )}
+                      </td>
+                    </tr>
+                  )}
+                </Fragment>
+              );
+            })}
           </tbody>
         </table>
       </div>
