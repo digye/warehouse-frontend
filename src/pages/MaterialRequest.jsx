@@ -21,8 +21,46 @@ export default function MaterialRequest() {
   const [confirmedId, setConfirmedId] = useState(null);
   const [products, setProducts] = useState([]);
   const [productsState, setProductsState] = useState('loading'); // 'loading' | 'ready' | 'error'
+  const [requesters, setRequesters] = useState([]);
+  const [warehouseList, setWarehouseList] = useState([]);
+  const [requesterMode, setRequesterMode] = useState('manual'); // 'manual' | 'known'
+  const [warehouseMode, setWarehouseMode] = useState('manual'); // 'manual' | 'known'
 
-  // Load the list of real products for the item dropdowns
+  // Load known requesters and warehouses for the dropdowns
+  useEffect(() => {
+    fetch(`${API_BASE}/material-requests/requesters`)
+      .then((res) => res.json())
+      .then((list) => {
+        setRequesters(list);
+        if (list.length) setRequesterMode('known');
+      })
+      .catch(() => {});
+
+    fetch(`${API_BASE}/material-requests/warehouses`)
+      .then((res) => res.json())
+      .then((list) => {
+        setWarehouseList(list);
+        if (list.length) setWarehouseMode('known');
+      })
+      .catch(() => {});
+  }, []);
+
+  function selectRequester(requesterId) {
+    const r = requesters.find((x) => String(x.requester_id) === requesterId);
+    if (r) {
+      update('requester_name', r.name);
+      update('requester_email', r.email);
+    }
+  }
+
+  function selectWarehouse(warehouseId) {
+    const w = warehouseList.find((x) => String(x.warehouse_id) === warehouseId);
+    if (w) {
+      update('warehouse_name', w.name);
+      update('warehouse_email', w.email || '');
+    }
+
+  } // Load the list of real products for the item dropdowns
   useEffect(() => {
     fetch(`${API_BASE}/material-requests/items`)
       .then((res) => {
@@ -123,27 +161,59 @@ export default function MaterialRequest() {
 
         {step === 'form' && (
           <form className="panel" onSubmit={handlePreview} style={{ padding: 24 }}>
-            <div className="field">
-              <label htmlFor="requester_name">Full Name</label>
-              <input
-                id="requester_name"
-                value={form.requester_name}
-                onChange={(e) => update('requester_name', e.target.value)}
-                placeholder="please enter your full name"
-                required
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="requester_email">Email Address</label>
-              <input
-                id="requester_email"
-                type="email"
-                value={form.requester_email}
-                onChange={(e) => update('requester_email', e.target.value)}
-                placeholder="please enter your email address"
-                required
-              />
-            </div>
+            {requesters.length > 0 && (
+              <div className="field">
+                <label htmlFor="known_requester">Who are you?</label>
+                <select
+                  id="known_requester"
+                  value={requesterMode === 'known'
+                    ? (requesters.find((r) => r.name === form.requester_name && r.email === form.requester_email)?.requester_id ?? '')
+                    : '__manual'}
+                  onChange={(e) => {
+                    if (e.target.value === '__manual') {
+                      setRequesterMode('manual');
+                    } else {
+                      setRequesterMode('known');
+                      selectRequester(e.target.value);
+                    }
+                  }}
+                  required={requesterMode === 'known'}
+                  style={{ width: '100%', padding: '9px 12px', border: '1px solid var(--line)', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', background: '#fff' }}
+                >
+                  <option value="" disabled>Select your name</option>
+                  {requesters.map((r) => (
+                    <option key={r.requester_id} value={r.requester_id}>{r.name} ({r.email})</option>
+                  ))}
+                  <option value="__manual">Someone else (not listed)</option>
+                </select>
+              </div>
+            )}
+
+            {requesterMode === 'manual' && (
+              <>
+                <div className="field">
+                  <label htmlFor="requester_name">Full Name</label>
+                  <input
+                    id="requester_name"
+                    value={form.requester_name}
+                    onChange={(e) => update('requester_name', e.target.value)}
+                    placeholder="please enter your full name"
+                    required
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="requester_email">Email Address</label>
+                  <input
+                    id="requester_email"
+                    type="email"
+                    value={form.requester_email}
+                    onChange={(e) => update('requester_email', e.target.value)}
+                    placeholder="please enter your email address"
+                    required
+                  />
+                </div>
+              </>
+            )}
 
             <label style={{ display: 'block', fontSize: 13, color: 'var(--muted)', marginBottom: 6 }}>
               Items
@@ -225,27 +295,59 @@ export default function MaterialRequest() {
                 onChange={(e) => update('needed_by', e.target.value)}
               />
             </div>
-            <div className="field">
-              <label htmlFor="warehouse_name">Warehouse Name</label>
-              <input
-                id="warehouse_name"
-                value={form.warehouse_name}
-                onChange={(e) => update('warehouse_name', e.target.value)}
-                placeholder="please select a warehouse"
-                required
-              />
-            </div>
-            <div className="field">
-              <label htmlFor="warehouse_email">Warehouse Email</label>
-              <input
-                id="warehouse_email"
-                type="email"
-                value={form.warehouse_email}
-                onChange={(e) => update('warehouse_email', e.target.value)}
-                placeholder="please select the warehouse email"
-                required
-              />
-            </div>
+            {warehouseList.length > 0 && (
+              <div className="field">
+                <label htmlFor="known_warehouse">Warehouse</label>
+                <select
+                  id="known_warehouse"
+                  value={warehouseMode === 'known'
+                    ? (warehouseList.find((w) => w.name === form.warehouse_name)?.warehouse_id ?? '')
+                    : '__manual'}
+                  onChange={(e) => {
+                    if (e.target.value === '__manual') {
+                      setWarehouseMode('manual');
+                    } else {
+                      setWarehouseMode('known');
+                      selectWarehouse(e.target.value);
+                    }
+                  }}
+                  required={warehouseMode === 'known'}
+                  style={{ width: '100%', padding: '9px 12px', border: '1px solid var(--line)', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', background: '#fff' }}
+                >
+                  <option value="" disabled>Select a warehouse</option>
+                  {warehouseList.map((w) => (
+                    <option key={w.warehouse_id} value={w.warehouse_id}>{w.name}</option>
+                  ))}
+                  <option value="__manual">Other (not listed)</option>
+                </select>
+              </div>
+            )}
+
+            {warehouseMode === 'manual' && (
+              <>
+                <div className="field">
+                  <label htmlFor="warehouse_name">Warehouse Name</label>
+                  <input
+                    id="warehouse_name"
+                    value={form.warehouse_name}
+                    onChange={(e) => update('warehouse_name', e.target.value)}
+                    placeholder="please select a warehouse"
+                    required
+                  />
+                </div>
+                <div className="field">
+                  <label htmlFor="warehouse_email">Warehouse Email</label>
+                  <input
+                    id="warehouse_email"
+                    type="email"
+                    value={form.warehouse_email}
+                    onChange={(e) => update('warehouse_email', e.target.value)}
+                    placeholder="please select the warehouse email"
+                    required
+                  />
+                </div>
+              </>
+            )}
 
             {error && <p style={{ color: 'var(--warn)', fontSize: 13, marginBottom: 12 }}>{error}</p>}
 

@@ -7,7 +7,7 @@ export default function Locations() {
   const [error, setError] = useState('');
 
   const [showWarehouseForm, setShowWarehouseForm] = useState(false);
-  const [warehouseForm, setWarehouseForm] = useState({ name: '', address: '' });
+  const [warehouseForm, setWarehouseForm] = useState({ name: '', address: '', email: '' });
 
   const [showLocationForm, setShowLocationForm] = useState(false);
   const [locationForm, setLocationForm] = useState({ warehouse_id: '', aisle: '', shelf: '', bin: '' });
@@ -34,7 +34,7 @@ export default function Locations() {
     setError('');
     try {
       await apiRequest('/warehouses', { method: 'POST', body: warehouseForm });
-      setWarehouseForm({ name: '', address: '' });
+      setWarehouseForm({ name: '', address: '', email: '' });
       setShowWarehouseForm(false);
       load();
     } catch (err) {
@@ -100,6 +100,15 @@ export default function Locations() {
               onChange={(e) => setWarehouseForm({ ...warehouseForm, address: e.target.value })}
             />
           </div>
+          <div className="field">
+            <label htmlFor="wemail">Email (used by the material request form)</label>
+            <input
+              id="wemail"
+              type="email"
+              value={warehouseForm.email}
+              onChange={(e) => setWarehouseForm({ ...warehouseForm, email: e.target.value })}
+            />
+          </div>
           <button className="btn" type="submit" disabled={saving}>
             {saving ? 'Saving...' : 'Save warehouse'}
           </button>
@@ -112,6 +121,7 @@ export default function Locations() {
             <tr>
               <th>Name</th>
               <th>Address</th>
+              <th>Email</th>
             </tr>
           </thead>
           <tbody>
@@ -119,6 +129,7 @@ export default function Locations() {
               <tr key={w.warehouse_id}>
                 <td>{w.name}</td>
                 <td>{w.address}</td>
+                <td>{w.email}</td>
               </tr>
             ))}
           </tbody>
