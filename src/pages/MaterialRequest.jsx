@@ -240,7 +240,7 @@ export default function MaterialRequest() {
                     onChange={(e) => updateLine(index, 'product_id', e.target.value)}
                     required
                     disabled={productsState !== 'ready' || products.length === 0}
-                    style={{ flex: 2, padding: '9px 12px', border: '1px solid var(--line)', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', background: '#fff' }}
+                    style={{ flex: 2, minWidth: 0,padding: '9px 12px', border: '1px solid var(--line)', borderRadius: 6, fontSize: 14, fontFamily: 'inherit', background: '#fff' }}
                   >
                     <option value="">
                       {productsState === 'loading' ? 'Loading items...' : 'Select an item'}
@@ -260,7 +260,7 @@ export default function MaterialRequest() {
                     value={line.quantity}
                     onChange={(e) => updateLine(index, 'quantity', e.target.value)}
                     required
-                    style={{ flex: 1, padding: '9px 12px', border: '1px solid var(--line)', borderRadius: 6, fontSize: 14, fontFamily: 'inherit' }}
+                    style={{ flex: 1, minWidth: 0, padding: '9px 12px', border: '1px solid var(--line)', borderRadius: 6, fontSize: 14, fontFamily: 'inherit' }}
                   />
                   {lines.length > 1 && (
                     <button
