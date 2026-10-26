@@ -68,7 +68,7 @@ export default function Locations() {
       <div className="page-header">
         <div>
           <h1>Warehouses &amp; Locations</h1>
-          <p>Set these up first so products have somewhere to be stocked</p>
+          <p>Where products have been be stocked</p>
         </div>
       </div>
 
