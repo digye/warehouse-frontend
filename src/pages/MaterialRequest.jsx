@@ -146,6 +146,11 @@ export default function MaterialRequest() {
     ? new Date(form.needed_by).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
     : 'Not specified';
 
+  <img
+  src="https://www.universal.com.gh/wp-content/uploads/2016/08/logo_normal.png"
+  alt="Universal Engineering & Consultancy Services"
+  style={{ width: 48, height: 48, objectFit: 'contain', marginBottom: 16 }}
+/>
   return (
     <div className="request-page">
       <div className="request-container">

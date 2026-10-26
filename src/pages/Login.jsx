@@ -37,6 +37,11 @@ export default function Login() {
         </div>
 
         <form className="login-card" onSubmit={handleSubmit}>
+          <img
+            src="https://www.universal.com.gh/wp-content/uploads/2016/08/logo_normal.png"
+            alt="Universal Engineering & Consultancy Services"
+            style={{ width: 48, height: 48, objectFit: 'contain', marginBottom: 12 }}
+          />
           <h1>Warehouse Manager</h1>
           <p>Sign in to continue</p>
 

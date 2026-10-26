@@ -23,7 +23,11 @@ export default function Layout() {
     <div className="app-shell">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          Ware<span>house</span>
+          <img
+            src="https://www.universal.com.gh/wp-content/uploads/2016/08/logo_normal.png"
+            alt="Universal Engineering & Consultancy Services"
+          />
+          <span>Warehouse Manager</span>
         </div>
         {links.map((link) => (
           <NavLink

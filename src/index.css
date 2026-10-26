@@ -54,15 +54,27 @@ button {
 }
 
 .sidebar-brand {
-  font-weight: 600;
-  font-size: 17px;
-  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 28px;
   padding: 0 12px;
 }
 
+.sidebar-brand img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: 6px;
+  background: #fff;
+  padding: 3px;
+}
+
 .sidebar-brand span {
-  color: var(--accent);
+  font-weight: 600;
+  font-size: 15px;
+  color: #fff;
+  line-height: 1.2;
 }
 
 .sidebar-link {
