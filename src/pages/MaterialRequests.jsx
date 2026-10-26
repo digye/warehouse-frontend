@@ -62,7 +62,8 @@ export default function MaterialRequests() {
       <div className="page-header">
         <div>
           <h1>Material Requests</h1>
-          <p>Incoming requests from maintenance staff. Approving deducts the stock automatically.</p>
+          <p>Incoming requests from maintenance staff.</p>
+          <p> Approving deducts the stock automatically.</p>
         </div>
       </div>
 
